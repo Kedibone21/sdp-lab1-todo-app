@@ -1,12 +1,18 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
- 
+  url      = env("DATABASE_URL")
 }
+
+enum Status {
+  Todo
+  InProgress
+  Complete
+}
+
 
 model Task {
   id          Int      @id @default(autoincrement())
@@ -14,7 +20,7 @@ model Task {
   description String
   dueDate     DateTime
   topic       String
-  status      String   @default("Todo")
+  status Status @default(Todo)
   archived    Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
