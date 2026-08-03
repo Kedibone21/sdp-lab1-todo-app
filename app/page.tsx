@@ -87,9 +87,11 @@ export default async function Home() {
               {task.status}
               <br />
               {task.dueDate.toLocaleDateString()}
-            </li>
-          ))}
-        </ul>
+              <br />
+              <a href={`/edit/${task.id}`}>Edit</a>
+           </li>
+         ))}
+      </ul>
       )}
     </main>
   );
