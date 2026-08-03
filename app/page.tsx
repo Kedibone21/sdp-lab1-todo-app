@@ -1,14 +1,25 @@
 import { prisma } from "@/lib/prisma";
 import { createTask, archiveTask } from "./actions";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string }>;
+}) {
+  const { sort } = await searchParams;
+
   const tasks = await prisma.task.findMany({
     where: {
       archived: false,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy:
+      sort === "topic"
+        ? { topic: "asc" }
+        : sort === "status"
+        ? { status: "asc" }
+        : sort === "dueDate"
+        ? { dueDate: "asc" }
+        : { createdAt: "desc" },
   });
 
   return (
@@ -68,13 +79,21 @@ export default async function Home() {
         </button>
       </form>
 
-      <hr />
+    <hr />
 
-       <p>
-        <a href="/archived">View Archived Tasks</a>
-      </p>
+    <p>
+      <a href="/archived">View Archived Tasks</a>
+    </p>
 
-      <h2>Tasks</h2>
+    <p>
+      Sort by:{" "}
+      <a href="/">Newest</a> |{" "}
+      <a href="/?sort=dueDate">Due Date</a> |{" "}
+      <a href="/?sort=topic">Topic</a> |{" "}
+      <a href="/?sort=status">Status</a>
+    </p>
+
+  <h2>Tasks</h2>
 
       {tasks.length === 0 ? (
         <p>No tasks yet.</p>
