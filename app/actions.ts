@@ -1,7 +1,9 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+
 import { redirect } from "next/navigation";
+
 
 export async function createTask(formData: FormData) {
   const title = formData.get("title") as string;
@@ -34,7 +36,20 @@ export async function updateTask(
       description: formData.get("description") as string,
       topic: formData.get("topic") as string,
       dueDate: new Date(formData.get("dueDate") as string),
-      status: formData.get("status") as string,
+      status: formData.get("status") as "Todo" | "InProgress" | "Complete",
+    },
+  });
+
+  redirect("/");
+}
+
+export async function archiveTask(id: number) {
+  await prisma.task.update({
+    where: {
+      id,
+    },
+    data: {
+      archived: true,
     },
   });
 

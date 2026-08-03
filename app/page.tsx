@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { createTask } from "./actions";
+import { createTask, archiveTask } from "./actions";
 
 export default async function Home() {
   const tasks = await prisma.task.findMany({
@@ -70,13 +70,17 @@ export default async function Home() {
 
       <hr />
 
+       <p>
+        <a href="/archived">View Archived Tasks</a>
+      </p>
+
       <h2>Tasks</h2>
 
       {tasks.length === 0 ? (
         <p>No tasks yet.</p>
       ) : (
         <ul>
-          {tasks.map((task) => (
+          {tasks.map((task: (typeof tasks)[number]) => (
             <li key={task.id}>
               <strong>{task.title}</strong>
               <br />
@@ -89,6 +93,17 @@ export default async function Home() {
               {task.dueDate.toLocaleDateString()}
               <br />
               <a href={`/edit/${task.id}`}>Edit</a>
+
+              <br />
+
+              <form action={archiveTask.bind(null, task.id)}>
+                <button type="submit">
+                   Archive
+                </button>
+              </form>
+
+
+
            </li>
          ))}
       </ul>
