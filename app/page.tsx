@@ -98,34 +98,47 @@ export default async function Home({
       {tasks.length === 0 ? (
         <p>No tasks yet.</p>
       ) : (
-        <ul>
-          {tasks.map((task: (typeof tasks)[number]) => (
-            <li key={task.id}>
-              <strong>{task.title}</strong>
-              <br />
-              {task.description}
-              <br />
-              {task.topic}
-              <br />
-              {task.status}
-              <br />
-              {task.dueDate.toLocaleDateString()}
-              <br />
-              <a href={`/edit/${task.id}`}>Edit</a>
+       <ul>
+  {tasks.map((task: (typeof tasks)[number]) => {
+    const isOverdue =
+      task.dueDate < new Date() &&
+      task.status !== "Complete";
 
-              <br />
+    return (
+      <li key={task.id}>
+        <strong>{task.title}</strong>
+        <br />
+        {task.description}
+        <br />
+        {task.topic}
+        <br />
+        {task.status}
+        <br />
+        {task.dueDate.toLocaleDateString()}
 
-              <form action={archiveTask.bind(null, task.id)}>
-                <button type="submit">
-                   Archive
-                </button>
-              </form>
+        <br />
 
+        {isOverdue && (
+          <span style={{ color: "red", fontWeight: "bold" }}>
+            ⚠️ OVERDUE
+          </span>
+        )}
 
+        <br />
 
-           </li>
-         ))}
-      </ul>
+        <a href={`/edit/${task.id}`}>Edit</a>
+
+        <br />
+
+        <form action={archiveTask.bind(null, task.id)}>
+          <button type="submit">
+            Archive
+          </button>
+        </form>
+      </li>
+    );
+  })}
+</ul>
       )}
     </main>
   );
