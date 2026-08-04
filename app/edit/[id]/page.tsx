@@ -21,78 +21,110 @@ export default async function EditTaskPage({
   const updateTaskWithId = updateTask.bind(null, task.id);
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>Edit Task</h1>
-
-      <form action={updateTaskWithId}>
+    <main className="mx-auto w-full max-w-4xl px-6 py-10">
+      <header className="mb-10 flex items-center justify-between">
         <div>
-          <label>Title</label>
-          <br />
-          <input
-            type="text"
-            name="title"
-            defaultValue={task.title}
-            required
-          />
+          <h1 className="text-5xl font-black text-black">
+            Edit Task
+          </h1>
+
+          <p className="mt-2 text-base text-slate-500">
+            Update your task details below.
+          </p>
         </div>
 
-        <br />
+        <a
+          href="/"
+          className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+        >
+          ← Back to Tasks
+        </a>
+      </header>
 
-        <div>
-          <label>Description</label>
-          <br />
-          <textarea
-            name="description"
-            defaultValue={task.description}
-            required
-          />
-        </div>
+      <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-md">
+        <form action={updateTaskWithId} className="space-y-5">
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
+              Title
+            </label>
 
-        <br />
+            <input
+              type="text"
+              name="title"
+              defaultValue={task.title}
+              required
+              className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </div>
 
-        <div>
-          <label>Due Date</label>
-          <br />
-          <input
-            type="date"
-            name="dueDate"
-            defaultValue={task.dueDate.toISOString().split("T")[0]}
-            required
-          />
-        </div>
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
+              Description
+            </label>
 
-        <br />
+            <textarea
+              name="description"
+              defaultValue={task.description}
+              rows={4}
+              required
+              className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </div>
 
-        <div>
-          <label>Topic</label>
-          <br />
-          <input
-            type="text"
-            name="topic"
-            defaultValue={task.topic}
-            required
-          />
-        </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Due Date
+              </label>
 
-        <br />
+              <input
+                type="date"
+                name="dueDate"
+                defaultValue={task.dueDate.toISOString().split("T")[0]}
+                required
+                className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </div>
 
-        <div>
-          <label>Status</label>
-          <br />
-          <select
-            name="status"
-            defaultValue={task.status}
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Topic
+              </label>
+
+              <input
+                type="text"
+                name="topic"
+                defaultValue={task.topic}
+                required
+                className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-slate-700">
+              Status
+            </label>
+
+            <select
+              name="status"
+              defaultValue={task.status}
+              className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            >
+              <option value="Todo">Todo</option>
+              <option value="InProgress">In Progress</option>
+              <option value="Complete">Complete</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-indigo-600 px-4 py-3 text-base font-semibold text-white transition hover:bg-indigo-700"
           >
-            <option value="Todo">Todo</option>
-            <option value="InProgress">In Progress</option>
-            <option value="Complete">Complete</option>
-          </select>
-        </div>
-
-        <br />
-
-        <button type="submit">Save Changes</button>
-      </form>
+            Save Changes
+          </button>
+        </form>
+      </section>
     </main>
   );
 }
