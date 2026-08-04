@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Todo App
 
-## Getting Started
+A local-first task management application built with Next.js and SQLite. There are no user
+accounts — it's designed to be downloaded and run by a single user on their own machine.
 
-First, run the development server:
+## Features
+
+- Create, edit, and archive tasks (each with a title, description, due date, and topic)
+- Tasks are never deleted — archiving hides a task from the active list while keeping it viewable
+- Three fixed statuses: Todo, In Progress, Complete
+- Sort the active task list by topic, status, or due date
+- Overdue tasks (past due date, not yet Complete) are visually flagged — overdue is not a status
+- All data persists in a local SQLite database across restarts
+
+## Third-Party Code
+
+| Package | Why it was chosen |
+|---|---|
+| **Next.js** | Provides the web framework — routing, server actions, and rendering — for the whole application. |
+| **React** | Used by Next.js to build the UI as components. |
+| **TypeScript** | Adds static typing across the app and Prisma-generated types, catching mistakes before runtime. |
+| **Prisma** (`@prisma/client`, `prisma`) | ORM used to define the database schema, run migrations, and query SQLite from the server actions. |
+| **SQLite** (via Prisma's `sqlite` datasource) | The local, file-based database — matches the brief's local-first requirement with zero external services. |
+| **Tailwind CSS** (`tailwindcss`, `@tailwindcss/postcss`) | Utility-first styling used for the application's layout and components. |
+| **Vitest** | Test runner used to write and run the behavioural tests described below. |
+| **ESLint** (`eslint`, `eslint-config-next`) | Lints the codebase against Next.js's recommended rules during development. |
+
+## Database Design
+
+The application uses a single SQLite database with one table, `Task`:
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | Integer, primary key | Auto-incrementing unique identifier. |
+| `title` | String | Required. |
+| `description` | String | Required. |
+| `dueDate` | DateTime | Required. |
+| `topic` | String | Required; free text, used for sorting/grouping. |
+| `status` | Enum (`Todo`, `InProgress`, `Complete`) | Defaults to `Todo`. Fixed, user-selectable but not user-defined. |
+| `archived` | Boolean | Defaults to `false`. Set to `true` instead of deleting a task, so archived tasks remain viewable. |
+| `createdAt` | DateTime | Defaults to the current time; used to order the "newest first" view. |
+
+**Relationships:** none. The application serves a single local user and has only one entity, so
+there are no foreign keys or related tables.
+
+**Overdue is derived, not stored.** There is no `overdue` column and no `Overdue` status. A task is
+treated as overdue at read time whenever `dueDate` is in the past and `status` is not `Complete`.
+This keeps the three statuses fixed, exactly as the brief requires.
+
+## Running It
+
+### Requirements
+
+- Node.js v20.20.2 (or later)
+
+### Install
+
+```bash
+git clone <repository-url>
+cd sdp-lab1-todo-app
+npm install
+```
+
+### Set up the database
+
+```bash
+npx prisma migrate deploy
+```
+
+This applies the existing migration in `prisma/migrations/` and creates `prisma/dev.db`.
+
+### Run the app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Run the tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test
+```
 
-## Learn More
+This runs Vitest against a separate, disposable `prisma/test.db`, which is reset before every run —
+your own `dev.db` and its contents are never touched.
 
-To learn more about Next.js, take a look at the following resources:
+## Testing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The test suite (`tests/tasks.test.ts`) covers four real behaviours against the SQLite database:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Create** — a task written with all four required fields is retrievable with the correct
+   values and default `status`/`archived` values.
+2. **Edit** — updating a task's fields persists the change.
+3. **Archive** — archiving a task sets `archived: true` without deleting the row, so it's still
+   retrievable.
+4. **Overdue** — a task with a past due date and a non-`Complete` status is correctly identified
+   as overdue by the same rule the UI uses.
